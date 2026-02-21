@@ -435,6 +435,11 @@ class Tesla {
         genericPost(url, notify);
     }
 
+    function remoteStartDrive(vehicle, notify) {
+        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_start_drive";
+        genericPost(url, notify);
+    }
+
     function mediaTogglePlayback(vehicle, notify) {
         var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_toggle_playback?use_command_protocol=1";
         genericPost(url, notify);

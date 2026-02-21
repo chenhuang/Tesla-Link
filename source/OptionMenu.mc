@@ -218,6 +218,10 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._subView = view;
             Ui.switchToView(view, delegate, Ui.SLIDE_UP);
         }
+        else if (item == :remote_start) {
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_START, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        }
 
         return true;
     }

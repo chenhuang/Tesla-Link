@@ -59,7 +59,8 @@ enum /* ACTION_TYPES */ {
 	ACTION_TYPE_CLIMATE_ON =              27,
 	ACTION_TYPE_CLIMATE_OFF =             28,
 	ACTION_TYPE_LOCK =                    29, // (from Complication call also)
-	ACTION_TYPE_UNLOCK =                  30  // (from Complication call also)
+	ACTION_TYPE_UNLOCK =                  30, // (from Complication call also)
+	ACTION_TYPE_REMOTE_START =            31
 }
 
 enum { /* Wake state */
@@ -865,6 +866,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				onReceive(1); // Show the first submenu
 				break;
 
+			case ACTION_TYPE_REMOTE_START:
+				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_remote_start_confirm));
+				delegate = new SimpleConfirmDelegate(method(:remoteStartConfirmed), method(:operationCanceled));
+				Ui.pushView(view, delegate, Ui.SLIDE_UP);
+				break;
+
 			default:
 				//DEBUG 2023-10-02*/ logMessage("actionMachine: WARNING Invalid action");
 				_stateMachineCounter = 1; // 0.1 second
@@ -1246,6 +1255,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_tesla.honkHorn(_vehicle_vin, method(:onCommandReturn));
 	}
 
+	function remoteStartConfirmed() {
+		//DEBUG*/ logMessage("actionMachine: Remote Start - waiting for onCommandReturn");
+		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_remote_start)]);
+		_tesla.remoteStartDrive(_vehicle_vin, method(:onCommandReturn));
+	}
+
 	function onSelect() {
 		if (_useTouch) {
 			return false;
@@ -1545,6 +1560,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 			case 26:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_dogmodewatch, null, :dogmode_watch, {}));
+				break;
+			case 27:
+				menu.addItem(new MenuItem(Rez.Strings.menu_label_remote_start, null, :remote_start, {}));
 				break;
 			default:
 				//DEBUG 2023-10-02*/ logMessage("addMenuItem: Index " + index + " out of range");

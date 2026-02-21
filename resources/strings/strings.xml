@@ -80,6 +80,7 @@
     <string id="menu_label_lock">Lock vehicle</string>
     <string id="menu_label_unlock">Unlock vehicle</string>
     <string id="menu_label_dogmodewatch">Dog Mode watch</string>
+    <string id="menu_label_remote_start">Remote Start</string>
 
 
 	<!--  Items in Settings only -->
@@ -193,7 +194,8 @@
     <string id="label_dogmode_toohigh">Temperature alert!\nCheck your vehicle!</string>
     <string id="label_mode_notavail">Sorry, this mode is\nnot availble for\nyour watch</string>
     <string id="label_leave_dog_mode">Exit dog mode watch?</string>
-    
+    <string id="label_remote_start">Starting vehicle</string>
+
 	<!--  Popup text -->
     <string id="label_open_frunk">Open Frunk?</string>
     <string id="label_open_trunk">Open Trunk?</string>
@@ -202,6 +204,7 @@
     <string id="label_close_vent">Close windows ?</string>
     <string id="label_should_we_wake">Wake </string>
     <string id="label_perform_complication">Peform watch action?</string>
+    <string id="label_remote_start_confirm">Enable keyless driving?</string>
 
 	<!--  Menu text -->
 	<string id="menu_option_title">Menu</string>

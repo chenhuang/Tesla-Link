@@ -77,6 +77,7 @@
     <string id="menu_label_lock">Lock vehicle</string>  <!--  NEW -->
     <string id="menu_label_unlock">Unlock vehicle</string>  <!--  NEW -->
     <string id="menu_label_dogmodewatch">Dog Mode watch</string>  <!--  NEW -->
+    <string id="menu_label_remote_start">Fernstart</string>
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">API Token (required for Teslemetry and Tessie)</string>  <!--  NEW -->
@@ -189,6 +190,7 @@
     <string id="label_dogmode_toohigh">Temperature alert!\nCheck your vehicle!</string>  <!--  NEW -->
     <string id="label_mode_notavail">Sorry, this mode is\nnot availble for\nyour watch</string>  <!--  NEW -->
     <string id="label_leave_dog_mode">Exit dog mode watch?</string>  <!--  NEW -->
+    <string id="label_remote_start">Fahrzeug startet</string>
 
     <!--  Popup text -->
     <string id="label_open_frunk">Frunk öffnen?</string>
@@ -198,6 +200,7 @@
     <string id="label_close_vent">Fensterspalt schließen?</string>
     <string id="label_should_we_wake">Aufwacken </string>
     <string id="label_perform_complication">Peform watch action?</string>  <!--  NEW -->
+    <string id="label_remote_start_confirm">Schlüsselloses Fahren aktivieren?</string>
 
     <!--  Menu text -->
     <string id="menu_option_title">Menü</string>
