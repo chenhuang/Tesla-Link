@@ -1,6 +1,6 @@
 <properties>
 	<property id="AppVersion" type="string"></property>
-	<property id="smallfontsize" type="boolean">false</property>
+	<property id="smallfontsize" type="boolean">true</property>
 	<property id="scrollclearsedge" type="boolean">false</property>
 	<property id="refreshToken" type="string"></property>
 	<property id="whichAPI" type="number">-1</property>
@@ -9,20 +9,20 @@
 	<property id="serverAUTHLocation" type="string">auth.tesla.com</property>
 	<property id="enhancedTouch" type="boolean">true</property>
 	<property id="useTouch" type="boolean">true</property>
-	<property id="quickReturn" type="boolean">false</property>
+	<property id="quickReturn" type="boolean">true</property>
 	<property id="titleScrolling" type="boolean">false</property>
 	<property id="WarnWhenPhoneNotConnected" type="boolean">false</property>
 	<property id="CrystalTesla" type="boolean">false</property>
-	<property id="swap_frunk_for_port" type="number">0</property>
+	<property id="swap_frunk_for_port" type="number">1</property>
 	<property id="HansshowFrunk" type="boolean">false</property>
-	<property id="screenBottomLeft" type="number">0</property>
-	<property id="screenBottomRight" type="number">0</property>
+	<property id="screenBottomLeft" type="number">3</property>
+	<property id="screenBottomRight" type="number">3</property>
 	<property id="complicationAction" type="number">0</property>
 	<property id="holdActionUpperLeft" type="number">0</property>
 	<property id="holdActionUpperRight" type="number">0</property>
 	<property id="holdActionLowerLeft" type="number">0</property>
 	<property id="holdActionLowerRight" type="number">0</property>
-	<property id="optionMenuOrder" type="string">1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27</property>
+	<property id="optionMenuOrder" type="string">27,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26</property>
 	<property id="batteryRangeType" type="number">0</property>
 	<property id="askWakeVehicle" type="boolean">true</property>
 	<property id="vehicleNameGlance" type="boolean">true</property>

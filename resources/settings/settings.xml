@@ -69,6 +69,7 @@
             <listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>
             <listEntry value="1">@Strings.menu_label_set_charging_amps</listEntry>
             <listEntry value="2">@Strings.menu_label_set_temp</listEntry>
+            <listEntry value="3">@Strings.menu_label_remote_start</listEntry>
         </settingConfig>
     </setting>
 
@@ -77,6 +78,7 @@
             <listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>
             <listEntry value="1">@Strings.menu_label_set_charging_amps</listEntry>
             <listEntry value="2">@Strings.menu_label_set_temp</listEntry>
+            <listEntry value="3">@Strings.menu_label_remote_start</listEntry>
         </settingConfig>
     </setting>
 
@@ -122,6 +124,7 @@
         <settingConfig type="list">
             <listEntry value="1">@Strings.menu_label_homelink</listEntry>
             <listEntry value="2">@Strings.menu_label_remote_boombox</listEntry>
+            <listEntry value="3">@Strings.menu_label_remote_start</listEntry>
             <listEntry value="0">@Strings.menu_label_none</listEntry>
         </settingConfig>
     </setting>
