@@ -3,6 +3,7 @@ using Toybox.System;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 
+(:full_app)
 class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     var _controller;
     var _previous_stateMachineCounter;
@@ -244,6 +245,71 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         }
 
         // Unless we missed data, restore _stateMachineCounter
+        _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
+    }
+}
+
+(:minimal_app)
+class OptionMenuDelegate extends Ui.Menu2InputDelegate {
+    var _controller;
+    var _previous_stateMachineCounter;
+
+    function initialize(controller) {
+        Ui.MenuInputDelegate.initialize();
+
+        _controller = controller;
+        _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter);
+        _controller._stateMachineCounter = -1;
+        _controller._waitingForCommandReturn = false;
+    }
+
+    function onBack() {
+        _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function onSelect(selected_item) {
+        var item = selected_item.getId();
+
+        if (item == :reset) {
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_RESET, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
+        }
+        else if (item == :select_car) {
+            _controller._tesla.getVehicleId(method(:onReceiveVehicles));
+        }
+        else if (item == :wake) {
+            _controller._wake_state = WAKE_NEEDED;
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        }
+        else if (item == :remote_start) {
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_START, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        }
+
+        return true;
+    }
+
+    function onReceiveVehicles(responseCode, data) {
+        if (responseCode == 200) {
+            var vehicles = data.get("response");
+            var size = vehicles.size();
+            var vinsName = new [size];
+            var vinsId = new [size];
+            var vinsVIN = new [size];
+            for (var i = 0; i < size; i++) {
+                vinsName[i] = vehicles[i].get("display_name");
+                vinsId[i] = vehicles[i].get("id");
+                vinsVIN[i] = vehicles[i].get("vin");
+            }
+            Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, vinsVIN, _controller), Ui.SLIDE_UP);
+        } else {
+            _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode]);
+        }
+
         _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
     }
 }

@@ -2,6 +2,7 @@ using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.Application.Storage;
 
+(:full_app)
 class SeatHeatPicker extends WatchUi.Picker {
 	// var _heat;
 	
@@ -38,6 +39,7 @@ class SeatHeatPicker extends WatchUi.Picker {
     }
 }
 
+(:full_app)
 class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
 

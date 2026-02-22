@@ -265,6 +265,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 	}
 
+	(:full_app)
 	function onReceive(args) {
 		if (args == 0) { // The sub page ended and sent us a _handler.invoke(0) call, display our main view
 			//logMessage("StateMachine: onReceive");
@@ -295,6 +296,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	    Ui.requestUpdate();
 	}
 
+	(:minimal_app)
+	function onReceive(args) {
+		if (args == 0) {
+			_stateMachineCounter = 1;
+		}
+		Ui.requestUpdate();
+	}
+
+	(:full_app)
 	function onSwipe(swipeEvent) {
 		if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
 	    	if (swipeEvent.getDirection() == WatchUi.SWIPE_LEFT) {
@@ -306,6 +316,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				Ui.pushView(view, delegate, Ui.SLIDE_UP);
 		    }
 		}
+		return true;
+	}
+
+	(:minimal_app)
+	function onSwipe(swipeEvent) {
 		return true;
 	}
 
@@ -1082,7 +1097,134 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_lastDataRun = System.getTimer();
 		/*DEBUG*/ logMessage("StateMachine: getVehicleData");
+		requestVehicleData();
+	}
+
+	(:full_app)
+	function requestVehicleData() {
 		_tesla.getVehicleData(_vehicle_vin, method(:onReceiveVehicleData));
+	}
+
+	(:minimal_app)
+	function requestVehicleData() {
+		_tesla.getVehicleStateLite(_vehicle_vin, method(:onReceiveVehicleStateLite));
+	}
+
+	(:minimal_app)
+	function onReceiveVehicleStateLite(responseCode, data) {
+		/*DEBUG*/ logMessage("onReceiveVehicleStateLite: " + responseCode);
+
+		SpinSpinner(responseCode);
+
+		if (_stateMachineCounter < 0) {
+			if (_stateMachineCounter == -1) {
+				_stateMachineCounter = -2;
+			}
+			return;
+		}
+
+		if (responseCode == 200) {
+			_lastError = null;
+			_vehicle_state = "online";
+			_data._vehicle_state = _vehicle_state;
+			_wake_state = WAKE_ONLINE;
+
+			if (data != null && data instanceof Lang.Dictionary && _tesla != null) {
+				var response = data.get("response");
+				if (response == null) {
+					response = data;
+				}
+
+				if (response != null && response instanceof Lang.Dictionary && response.get("vehicle_state") != null) {
+					/*DEBUG*/ logMessage("onReceiveVehicleStateLite: " + responseCode + " Received data");
+					_data._vehicle_data = response;
+
+					if (_waitingForCommandReturn) {
+						_handler.invoke([0, -1, null]);
+						_stateMachineCounter = 1;
+						_waitingForCommandReturn = false;
+					}
+					else {
+						_handler.invoke([1, -1, null]);
+					}
+
+					if (_408_count) {
+						_408_count = 0;
+					}
+
+					if (_waitingFirstData > 0) {
+						_waitingFirstData = 0;
+						_waitingForCommandReturn = false;
+						_stateMachineCounter = 1;
+						_wake_state = WAKE_SENT;
+						_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
+						return;
+					}
+
+					var timeDelta = System.getTimer() - _lastDataRun;
+					timeDelta = _refreshTimeInterval - timeDelta;
+					if (timeDelta > 500) {
+						_stateMachineCounter = (timeDelta / 100).toNumber();
+						return;
+					}
+				} else {
+					/*DEBUG*/ logMessage("onReceiveVehicleStateLite: " + responseCode + " WARNING incomplete data");
+				}
+			} else {
+				/*DEBUG*/ logMessage("onReceiveVehicleStateLite: " + responseCode + " WARNING no data");
+			}
+			_stateMachineCounter = 5;
+		}
+		else {
+			_stateMachineCounter = 5;
+			_lastError = responseCode;
+
+			if (_waitingFirstData > 0) {
+				_waitingFirstData = 1;
+			}
+
+			if (responseCode == 408) {
+				var i = _408_count + 1;
+				/*DEBUG*/ logMessage("onReceiveVehicleStateLite: " + responseCode + " 408_count=" + i);
+				if (_waitingFirstData > 0 && _view._data._ready == false) {
+					_handler.invoke([3, i, Ui.loadResource(_wake_state >= WAKE_UNKNOWN ? Rez.Strings.label_requesting_data : Rez.Strings.label_waking_vehicle)]);
+				}
+				if ((_408_count % 10 == 0 && _waitingFirstData > 0) || (_408_count % 10 == 1 && _waitingFirstData == 0)) {
+					if (_408_count < 2 && _waitingFirstData == 0) {
+						gWaitTime = System.getTimer();
+					}
+					_check_wake = CHECK_WAKE_CHECK_AND_WAKE;
+				}
+				_408_count++;
+			} else {
+				if (responseCode == 404) {
+					_vehicle_id = VEHICLE_ID_NEED_LIST;
+					_handler.invoke([0, -1, buildErrorString(responseCode)]);
+				}
+				else if (responseCode == 401) {
+					if (_useTeslaAPI) {
+						_need_auth = true;
+						_resetToken();
+						_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+					}
+					else {
+						_stateMachineCounter = 50;
+						_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_invalid_token)]);
+					}
+				}
+				else if (responseCode == -402 || responseCode == -403) {
+					_handler.invoke([0, -1, buildErrorString(responseCode)]);
+					_stateMachineCounter = 0;
+				}
+				else if (responseCode == 429 || responseCode == -400) {
+					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+					_stateMachineCounter = 100;
+				}
+				else if (responseCode != -5 && responseCode != -101) {
+					_handler.invoke([0, -1, buildErrorString(responseCode)]);
+				}
+			}
+		}
 	}
 
 	function workerTimer() {
@@ -1270,6 +1412,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		return true;
 	}
 
+	(:full_app)
 	function doSelect() {
 		//DEBUG*/ logMessage("doSelect: climate on/off");
 		if (!_data._ready) {
@@ -1281,6 +1424,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_ON, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		} else {
 			_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_OFF, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+		}
+	}
+
+	(:minimal_app)
+	function doSelect() {
+		/*DEBUG*/ logMessage("doSelect: lock/unlock (minimal)");
+		if (!_data._ready) {
+			return;
+		}
+
+		if (_data._vehicle_data.get("vehicle_state").get("locked")) {
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_UNLOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+		} else {
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_LOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 	}
 
@@ -1316,6 +1473,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		return true;
 	}
 
+	(:full_app)
 	function doPreviousPage() {
 		//DEBUG*/ logMessage("doPreviousPage: trunk/frunk/port");
 		if (!_data._ready) {
@@ -1402,6 +1560,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			default:
 				//DEBUG 2023-10-02*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + $.getProperty("swap_frunk_for_port", 0, method(:validateNumber)));
 		}
+	}
+
+	(:minimal_app)
+	function doPreviousPage() {
+		/*DEBUG*/ logMessage("doPreviousPage: remote start (minimal)");
+		if (!_data._ready) {
+			return;
+		}
+
+		_pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_START, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 	}
 
 	function onMenu() {
@@ -1570,6 +1738,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 	}
 	
+	(:full_app)
 	function doMenu() {
 		//DEBUG*/ logMessage("doMenu: Menu");
 		if (!_data._ready) {
@@ -1582,8 +1751,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		for (var i = 0; i < menuItems.size(); i++) {
 			addMenuItem(thisMenu, menuItems[i]);
 		}
-		
+
 		Ui.pushView(thisMenu, new OptionMenuDelegate(self), Ui.SLIDE_UP );
+	}
+
+	(:minimal_app)
+	function doMenu() {
+		/*DEBUG*/ logMessage("doMenu: minimal menu");
+		if (!_data._ready) {
+			return;
+		}
+
+		var thisMenu = new Ui.Menu2({:title=>Rez.Strings.menu_option_title});
+		thisMenu.addItem(new MenuItem(Rez.Strings.menu_label_remote_start, null, :remote_start, {}));
+		thisMenu.addItem(new MenuItem(Rez.Strings.menu_label_select_car, null, :select_car, {}));
+		thisMenu.addItem(new MenuItem(Rez.Strings.menu_label_wake, null, :wake, {}));
+		thisMenu.addItem(new MenuItem(Rez.Strings.menu_label_reset, null, :reset, {}));
+		Ui.pushView(thisMenu, new OptionMenuDelegate(self), Ui.SLIDE_UP);
 	}
 
 	function onBack() {
@@ -1595,6 +1779,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 	}
 
+	(:full_app)
 	function onTap(click) {
 		if (!_data._ready)
 		{
@@ -1693,6 +1878,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		return true;
 	}
 
+	(:full_app)
 	function onHold(click) {
 		if (!_data._ready)
 		{
@@ -2197,6 +2383,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						_stateMachineCounter = 50;  // 5 seconds
 						_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_invalid_token)]);
 					}
+				}
+				else if (responseCode == -402 || responseCode == -403) { // Response too large or out of memory, retrying won't help
+					/*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode + " response too large for device memory, stopping");
+					_handler.invoke([0, -1, buildErrorString(responseCode)]);
+					_stateMachineCounter = 0; // Stop retrying, this error is not transient
 				}
 				else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
 					/*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);

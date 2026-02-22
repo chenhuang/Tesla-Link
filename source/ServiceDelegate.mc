@@ -38,7 +38,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (token != null && vehicle != null) {
             //DEBUG*/ logMessage("BG-onTemporalEvent getting data");
             Communications.makeWebRequest(
-                "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
+                "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data?endpoints=charge_state;vehicle_state", null,
                 {
                     :method => Communications.HTTP_REQUEST_METHOD_GET,
                     :headers => {
@@ -124,15 +124,19 @@ class MyServiceDelegate extends System.ServiceDelegate {
             data.put("charging_state", $.validateString(str.substring(0, posEnd), ""));
 
             pos = responseData.find("inside_temp");
-            str = responseData.substring(pos + 13, pos + 20);
-            posEnd = str.find(",");
-            data.put("inside_temp", $.validateNumber(str.substring(0, posEnd), 0));
+            if (pos != null) {
+                str = responseData.substring(pos + 13, pos + 20);
+                posEnd = str.find(",");
+                data.put("inside_temp", $.validateNumber(str.substring(0, posEnd), 0));
+            }
 
             pos = responseData.find("shift_state");
-            str = responseData.substring(pos + 13, pos + 20);
-            posEnd = str.find(",");
-            var value = $.validateString(str.substring(0, posEnd), "");
-            data.put("shift_state", (value.equals("null") ? "P" : value));
+            if (pos != null) {
+                str = responseData.substring(pos + 13, pos + 20);
+                posEnd = str.find(",");
+                var value = $.validateString(str.substring(0, posEnd), "");
+                data.put("shift_state", (value.equals("null") ? "P" : value));
+            }
 
             pos = responseData.find("sentry_mode");
             str = responseData.substring(pos + 13, pos + 20);

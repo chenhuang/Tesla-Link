@@ -97,9 +97,8 @@ class TeslaLink extends App.AppBase {
     function getGlanceView() {
 		//DEBUG*/ logMessage("Glance: Starting");
         Storage.setValue("fromGlance", true);
-        Storage.setValue("runBG", true);
+        Storage.setValue("runBG", false);
 
-        Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         _glanceView = new GlanceView();
         return [ _glanceView ];
     }

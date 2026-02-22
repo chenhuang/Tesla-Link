@@ -93,6 +93,12 @@ class Tesla {
         genericGet(url, notify);
     }
 
+    (:minimal_app)
+    function getVehicleStateLite(vehicle, notify) {
+        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data?endpoints=vehicle_state";
+        genericGet(url, notify);
+    }
+
     function getVehicleState(vehicle, notify) {
         var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/data_request/vehicle_state";
         genericGet(url, notify);

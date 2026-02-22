@@ -1,6 +1,7 @@
 using Toybox.WatchUi as Ui;
 
 
+(:full_app)
 class TrunksMenuDelegate extends Ui.Menu2InputDelegate {
     var _controller;
     var _previous_stateMachineCounter;

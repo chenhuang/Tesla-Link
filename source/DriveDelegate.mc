@@ -6,6 +6,7 @@ using Toybox.Communications as Communications;
 using Toybox.Cryptography;
 using Toybox.Graphics;
 
+(:full_app)
 class DriveDelegate extends Ui.BehaviorDelegate {
 	var _view as DriveView;
     var _handler;

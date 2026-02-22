@@ -39,47 +39,10 @@ class GlanceView extends Ui.GlanceView {
 
 (:bkgnd32kb)
     function onShow() {
-		/*DEBUG*/ logMessage("GlanceView (32b):onShow");
-        var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
-        var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
-        var expired;
-        if (tokenCreatedAt != null && tokenExpiresIn != null) {
-    		var timeNow = Time.now().value();
-		    expired = (timeNow > tokenCreatedAt + tokenExpiresIn);
-        }
-        else {
-            expired = true;
-        }
-
-        _showLaunch = (Storage.getValue("token") == null || Storage.getValue("vehicle") == null || expired);
-        
-        _refreshTimer.start(method(:refreshView), 50, true);
-
-        resetSavedPosition();
     }
 
 (:bkgnd64kb)
     function onShow() {
-		/*DEBUG*/ logMessage("GlanceView:onShow");
-        var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
-        var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
-        var expired;
-        if (tokenCreatedAt != null && tokenExpiresIn != null) {
-    		var timeNow = Time.now().value();
-		    expired = (timeNow > tokenCreatedAt + tokenExpiresIn);
-        }
-        else {
-            expired = true;
-        }
-
-        var noToken = (Storage.getValue("token") == null);
-        var noVehicle = (Storage.getValue("vehicle") == null);
-        var refreshToken = Properties.getValue("refreshToken");
-        _showLaunch = (expired || noToken || noVehicle || (refreshToken == null || refreshToken.equals("")));
- 
-        _refreshTimer.start(method(:refreshView), 50, true);
-
-        resetSavedPosition();
     }
 
     function onHide() {
@@ -145,6 +108,23 @@ class GlanceView extends Ui.GlanceView {
     }
 
     function onUpdate(dc) {
+        if (gSettingsChanged != null && gSettingsChanged) {
+            gSettingsChanged = false;
+            onLayout(dc);
+        }
+
+        var vehicle_name = Storage.getValue("vehicle_name");
+        if (vehicle_name == null) {
+            vehicle_name = Ui.loadResource(Rez.Strings.vehicle);
+        } else {
+            vehicle_name = vehicle_name.toUpper();
+        }
+
+        dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(0, _dcHeight / 2, _usingFont, vehicle_name, Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    function onUpdate_unused(dc) {
         // Retrieve the name of the vehicle if we have it, or the generic string otherwise
         //DEBUG 2023-10-02*/ var showLog = false;
 

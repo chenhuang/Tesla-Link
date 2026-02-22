@@ -2,6 +2,7 @@ using Toybox.WatchUi as Ui;
 using Toybox.Graphics;
 using Toybox.Application.Storage;
 
+(:full_app)
 class DogModeDelegate extends Ui.BehaviorDelegate {
     var _view;
     var _controller;

@@ -3,6 +3,7 @@ using Toybox.Graphics;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 
+(:full_app)
 class MediaControlView extends Ui.View {
     var _useTouch;
     var _showVolume;

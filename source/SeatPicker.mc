@@ -2,6 +2,7 @@ using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.Application.Storage;
 
+(:full_app)
 class SeatPicker extends WatchUi.Picker {
     function initialize (seats) {
         var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_choose_seat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
@@ -17,6 +18,7 @@ class SeatPicker extends WatchUi.Picker {
     }
 }
 
+(:full_app)
 class SeatPickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
 

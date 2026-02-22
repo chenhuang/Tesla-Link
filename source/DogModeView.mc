@@ -4,7 +4,7 @@ using Toybox.Graphics;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 
-(:superapp)
+(:full_app, :superapp)
 class DogModeView extends Ui.View {
     var _data;
     var _text;
@@ -170,7 +170,7 @@ class DogModeView extends Ui.View {
     }
 }
 
-(:nosuperapp)
+(:full_app, :nosuperapp)
 class DogModeView extends Ui.View {
     function initialize(data) {
         View.initialize();

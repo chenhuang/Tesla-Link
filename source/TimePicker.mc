@@ -15,6 +15,7 @@ const FACTORY_COUNT_12_HOUR = 4;
 const MINUTE_FORMAT = "%02d";
 
 //! Picker that allows the user to choose a time
+(:full_app)
 class DepartureTimePicker extends WatchUi.Picker {
     //! Constructor
     public function initialize(time) {
@@ -74,6 +75,7 @@ class DepartureTimePicker extends WatchUi.Picker {
 }
 
 //! Responds to a time picker selection or cancellation
+(:full_app)
 class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
 	var _controller;
 	

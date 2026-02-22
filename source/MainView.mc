@@ -238,6 +238,15 @@ class MainView extends Ui.View {
 			_data._ready = true;
 			_errorTimer = 0;
 
+			drawVehicleData(dc, width, height, center_x, center_y);
+		}
+		else {
+			// 2023-03-20 logMessage("MainView:onUpdate: How did we get here?");
+		}
+	}
+
+	(:full_app)
+	function drawVehicleData(dc, width, height, center_x, center_y) {
 			// We're going to use the image layout by default if it's a touchscreen, also check the option setting to allow toggling
 			var is_touchscreen = System.getDeviceSettings().isTouchScreen;
 			var use_image_layout = Storage.getValue("image_view");
@@ -669,9 +678,34 @@ class MainView extends Ui.View {
 				climate_state_drawable.draw(dc);
 				battery_level_drawable.draw(dc);
 			}
-		}
-		else {
-			// 2023-03-20 logMessage("MainView:onUpdate: How did we get here?");
+	}
+
+	(:minimal_app)
+	function drawVehicleData(dc, width, height, center_x, center_y) {
+		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+		dc.clear();
+
+		// Lock status
+		var locked = $.validateBoolean(_data._vehicle_data.get("vehicle_state").get("locked"), false);
+		var door_open = $.validateNumber(_data._vehicle_data.get("vehicle_state").get("df"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("dr"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pf"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pr"), 0);
+
+		// Draw lock icon centered
+		var bm = Ui.loadResource(locked ? Rez.Drawables.locked_icon : door_open ? Rez.Drawables.door_open_icon : Rez.Drawables.unlocked_icon);
+		dc.drawBitmap(center_x - bm.getWidth() / 2, center_y - bm.getHeight() / 2, bm);
+
+		// Lock status text below icon
+		var statusText = locked ? Ui.loadResource(Rez.Strings.label_locked) : (door_open ? Ui.loadResource(Rez.Strings.label_unlocked) : Ui.loadResource(Rez.Strings.label_unlocked));
+		var statusY = center_y + bm.getHeight() / 2 + 2;
+		dc.drawText(center_x, statusY, Graphics.FONT_SMALL, statusText, Graphics.TEXT_JUSTIFY_CENTER);
+
+		// Vehicle name just above "Locked"
+		var vehicle_name = $.validateString(_data._vehicle_data.get("vehicle_state").get("vehicle_name"), "");
+		dc.drawText(center_x, statusY - Graphics.getFontHeight(Graphics.FONT_XTINY) - 2, Graphics.FONT_XTINY, vehicle_name, Graphics.TEXT_JUSTIFY_CENTER);
+
+		// Spinner below status
+		var _spinner = Storage.getValue("spinner");
+		if (_spinner != null) {
+			dc.drawText(center_x, center_y + bm.getHeight() / 2 + 24, Graphics.FONT_XTINY, _spinner.toString(), Graphics.TEXT_JUSTIFY_CENTER);
 		}
 	}
 }

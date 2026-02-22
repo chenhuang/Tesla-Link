@@ -10,6 +10,7 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 //! Picker that allows the user to choose a temperature
+(:full_app)
 class RefreshPicker extends WatchUi.Picker {
 
     //! Constructor
@@ -32,6 +33,7 @@ class RefreshPicker extends WatchUi.Picker {
 }
 
 //! Responds to a temperature picker selection or cancellation
+(:full_app)
 class RefreshPickerDelegate extends WatchUi.PickerDelegate {
 	var _controller;
 	

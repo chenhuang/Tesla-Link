@@ -3,6 +3,7 @@ using Toybox.WatchUi as Ui;
 using Toybox.System;
 using Toybox.Time;
 
+(:full_app)
 class ClimateView extends Ui.View {
     hidden var _display;
     var _data;

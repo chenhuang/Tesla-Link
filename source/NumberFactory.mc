@@ -9,6 +9,7 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 //! Factory that controls which numbers can be picked
+(:full_app)
 class NumberFactory extends WatchUi.PickerFactory {
     private var _start as Number;
     private var _stop as Number;

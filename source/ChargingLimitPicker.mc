@@ -11,6 +11,7 @@ import Toybox.WatchUi;
 
 
 //! Picker that allows the user to choose a charging curremt
+(:full_app)
 class ChargingLimitPicker extends WatchUi.Picker {
     //! Constructor
     public function initialize(charging_limit) {
@@ -32,6 +33,7 @@ class ChargingLimitPicker extends WatchUi.Picker {
 }
 
 //! Responds to a charger picker selection or cancellation
+(:full_app)
 class ChargingLimitPickerDelegate extends WatchUi.PickerDelegate {
 	var _controller;
 	

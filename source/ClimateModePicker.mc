@@ -1,6 +1,7 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
 
+(:full_app)
 class ClimateModePicker extends WatchUi.Picker {
     function initialize (modes) {
         var title = new WatchUi.Text({:text=>Rez.Strings.label_climate_which, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
@@ -15,6 +16,7 @@ class ClimateModePicker extends WatchUi.Picker {
     }
 }
 
+(:full_app)
 class ClimateModePickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
 
