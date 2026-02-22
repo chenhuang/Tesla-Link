@@ -1779,7 +1779,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 	}
 
-	(:full_app)
 	function onTap(click) {
 		if (!_data._ready)
 		{
@@ -1813,53 +1812,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		// Tap on the middle text line where Departure is written
 		else if (enhancedTouch && y > (_settings.screenHeight / 2.3).toNumber() && y < (_settings.screenHeight / 1.8).toNumber()) {
-			var time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
-			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-				_pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
-			}
-			else {
-				Ui.pushView(new DepartureTimePicker(time), new DepartureTimePickerDelegate(self), Ui.SLIDE_IMMEDIATE);
-			}
-		} 
+			handleTapDeparture();
+		}
 		// Tap on bottom line on screen
 		else if (enhancedTouch && y > (_settings.screenHeight  / 1.25).toNumber() && _tesla != null) {
-			var screenBottom = $.getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight", 0, method(:validateNumber));
-			switch (screenBottom) {
-				case 0:
-		        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
-		            Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(self), Ui.SLIDE_UP);
-		            break;
-		        case 1:
-		        	var max_amps = _data._vehicle_data.get("charge_state").get("charge_current_request_max");
-		            var charging_amps = _data._vehicle_data.get("charge_state").get("charge_current_request");
-		            if (charging_amps == null) {
-		            	if (max_amps == null) {
-		            		charging_amps = 32;
-		            	}
-		            	else {
-		            		charging_amps = max_amps;
-		            	}
-		            }
-		            
-		            Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(self), Ui.SLIDE_UP);
-		            break;
-		        case 2:
-		            var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
-		            var max_temp =    _data._vehicle_data.get("climate_state").get("max_avail_temp");
-		            var min_temp =    _data._vehicle_data.get("climate_state").get("min_avail_temp");
-
-		            if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
-		            	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
-		            	max_temp = max_temp * 9.0 / 5.0 + 32.0;
-		            	min_temp = min_temp * 9.0 / 5.0 + 32.0;
-		            }
-
-		            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(self), Ui.SLIDE_UP);
-					break;
-				case 3:
-					_pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_START, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
-					break;
-			}
+			handleTapBottomLine(x);
 		}
 		else if (x < _settings.screenWidth/2) {
 			if (y < _settings.screenHeight/2) {
@@ -1879,12 +1836,71 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	(:full_app)
+	function handleTapDeparture() {
+		var time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
+		if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
+		}
+		else {
+			Ui.pushView(new DepartureTimePicker(time), new DepartureTimePickerDelegate(self), Ui.SLIDE_IMMEDIATE);
+		}
+	}
+
+	(:minimal_app)
+	function handleTapDeparture() {
+	}
+
+	(:full_app)
+	function handleTapBottomLine(x) {
+		var screenBottom = $.getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight", 0, method(:validateNumber));
+		switch (screenBottom) {
+			case 0:
+	        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
+	            Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(self), Ui.SLIDE_UP);
+	            break;
+	        case 1:
+	        	var max_amps = _data._vehicle_data.get("charge_state").get("charge_current_request_max");
+	            var charging_amps = _data._vehicle_data.get("charge_state").get("charge_current_request");
+	            if (charging_amps == null) {
+	            	if (max_amps == null) {
+	            		charging_amps = 32;
+	            	}
+	            	else {
+	            		charging_amps = max_amps;
+	            	}
+	            }
+
+	            Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(self), Ui.SLIDE_UP);
+	            break;
+	        case 2:
+	            var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
+	            var max_temp =    _data._vehicle_data.get("climate_state").get("max_avail_temp");
+	            var min_temp =    _data._vehicle_data.get("climate_state").get("min_avail_temp");
+
+	            if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
+	            	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
+	            	max_temp = max_temp * 9.0 / 5.0 + 32.0;
+	            	min_temp = min_temp * 9.0 / 5.0 + 32.0;
+	            }
+
+	            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(self), Ui.SLIDE_UP);
+				break;
+			case 3:
+				_pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_START, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+				break;
+		}
+	}
+
+	(:minimal_app)
+	function handleTapBottomLine(x) {
+	}
+
 	function onHold(click) {
 		if (!_data._ready)
 		{
 			return true;
 		}
-		
+
 		var drive_state = _data._vehicle_data.get("drive_state");
 		if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
 			//DEBUG*/ logMessage("doPreviousPage: Moving, ignoring command");
