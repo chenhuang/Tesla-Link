@@ -1266,8 +1266,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					_stateMachineCounter--;
 				}
 			}
-			else if (_view._data._ready == true && _lastError == null) {
-				// We're not displaying a message on screen and the last webRequest returned responseCode 200, do you thing actionMenu!
+			else if (_view._data._ready == true && (_lastError == null || _lastError == 429 || _lastError == -400)) {
+				// Allow actions when we have data: last request was 200 (normal) or rate-limited 429 (have data but polling throttled)
 				/*DEBUG*/ logMessage("workerTimer: Do action");
 				actionMachine();
 			}
