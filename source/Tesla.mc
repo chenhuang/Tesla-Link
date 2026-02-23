@@ -95,7 +95,16 @@ class Tesla {
 
     (:minimal_app)
     function getVehicleStateLite(vehicle, notify) {
-        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data?endpoints=vehicle_state";
+        var url;
+        if (_useTessieCacheMode && _noCacheNextVehicleData == false) {
+            url = "https://" + _serverAPILocation + "/" + vehicle.toString() + "/state?use_cache=true";
+        }
+        else {
+            url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data?endpoints=vehicle_state";
+        }
+
+        _noCacheNextVehicleData = false;
+
         genericGet(url, notify);
     }
 

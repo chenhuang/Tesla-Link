@@ -1156,8 +1156,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						_waitingFirstData = 0;
 						_waitingForCommandReturn = false;
 						_stateMachineCounter = 1;
-						_wake_state = WAKE_SENT;
-						_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
+						if (!_wakeWasConfirmed && _tesla.getTessieCacheMode() == false) {
+							_wake_state = WAKE_SENT;
+							_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
+						}
 						return;
 					}
 
