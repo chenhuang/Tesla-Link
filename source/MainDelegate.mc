@@ -141,6 +141,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _stateMachineCounter;
 	var _serverAUTHLocation;
 
+	(:full_app)
+	function getDefaultRefreshInterval() { return 4000; }
+	(:minimal_app)
+	function getDefaultRefreshInterval() { return 30000; }
+
 	function initialize(view as MainView, data, handler) {
 		BehaviorDelegate.initialize();
 	
@@ -254,7 +259,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		
 		_refreshTimeInterval = Storage.getValue("refreshTimeInterval");
 		if (_refreshTimeInterval == null || _refreshTimeInterval.toNumber() < 500) {
-			_refreshTimeInterval = 4000;
+			_refreshTimeInterval = getDefaultRefreshInterval();
 		}
 
 		if (_token == null) {
@@ -1156,10 +1161,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						_waitingFirstData = 0;
 						_waitingForCommandReturn = false;
 						_stateMachineCounter = 1;
-						if (!_wakeWasConfirmed && _tesla.getTessieCacheMode() == false) {
-							_wake_state = WAKE_SENT;
-							_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
-						}
+						_wake_state = WAKE_SENT;
+						_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
 						return;
 					}
 
